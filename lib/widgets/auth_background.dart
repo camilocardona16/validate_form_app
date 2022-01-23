@@ -1,17 +1,42 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
 
 class AuthBackground extends StatelessWidget {
-  const AuthBackground({Key? key}) : super(key: key);
+  final Widget child;
+
+  const AuthBackground({
+    Key? key,
+    required this.child,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: double.infinity,
       child: Stack(
-        children: const [
-          _PurpleBox(),
+        children: [
+          const _PurpleBox(),
+          const _IconoUser(),
+          child,
         ],
+      ),
+    );
+  }
+}
+
+class _IconoUser extends StatelessWidget {
+  const _IconoUser({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const SafeArea(
+      child: SizedBox(
+        width: double.infinity,
+        child: Icon(Icons.person_pin, color: Colors.white, size: 100),
       ),
     );
   }
@@ -64,7 +89,7 @@ class _Bubble extends StatelessWidget {
       height: 100,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
-          color: Color.fromRGBO(255, 255, 255, 0.05)),
+          color: const Color.fromRGBO(255, 255, 255, 0.05)),
     );
   }
 }
