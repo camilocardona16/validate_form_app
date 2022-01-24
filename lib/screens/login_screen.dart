@@ -62,6 +62,16 @@ class _LoginForm extends StatelessWidget {
                 labelText: 'Correo electronico',
                 prefixIcon: Icons.alternate_email_sharp,
               ),
+              // valdiacion
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) {
+                String pattern =
+                    r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+                RegExp regExp = new RegExp(pattern);
+                return regExp.hasMatch(value ?? '')
+                    ? null
+                    : 'El correo no es correcto';
+              },
             ),
             const SizedBox(height: 30),
             TextFormField(
@@ -72,6 +82,12 @@ class _LoginForm extends StatelessWidget {
                   hintText: '****',
                   labelText: 'Contraseña',
                   prefixIcon: Icons.lock_outline),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) {
+                return (value != null && value.length >= 6)
+                    ? null
+                    : 'La contraseña debe de ser mayor de 6 caracteres';
+              },
             ),
             const SizedBox(height: 30),
             MaterialButton(
