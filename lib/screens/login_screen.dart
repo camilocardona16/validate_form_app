@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:form_validation_app/providers/login_form_provider.dart';
+import 'package:form_validation_app/screens/screens.dart';
+import 'package:provider/provider.dart';
+
 import 'package:form_validation_app/ui/input_decorations.dart';
 import 'package:form_validation_app/widgets/widgets.dart';
 
@@ -23,7 +27,10 @@ class LoginScreen extends StatelessWidget {
                     style: Theme.of(context).textTheme.headline4,
                   ),
                   const SizedBox(height: 30),
-                  _LoginForm()
+                  ChangeNotifierProvider(
+                    create: (_) => LoginFormProvider(),
+                    child: const _LoginForm(),
+                  )
                 ],
               ),
             ),
@@ -50,67 +57,75 @@ class _LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Form(
-        child: Column(
-          children: [
-            TextFormField(
-              autocorrect: false,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecorations.authInputDecoration(
-                hintText: 'correo@example.com',
-                labelText: 'Correo electronico',
-                prefixIcon: Icons.alternate_email_sharp,
-              ),
-              // valdiacion
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                String pattern =
-                    r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-                RegExp regExp = new RegExp(pattern);
-                return regExp.hasMatch(value ?? '')
-                    ? null
-                    : 'El correo no es correcto';
-              },
+    final loginForm = Provider.of<LoginFormProvider>(context);
+    return Form(
+      key: loginForm.formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            autocorrect: false,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecorations.authInputDecoration(
+              hintText: 'correo@example.com',
+              labelText: 'Correo electronico',
+              prefixIcon: Icons.alternate_email_sharp,
             ),
-            const SizedBox(height: 30),
-            TextFormField(
-              autocorrect: false,
-              obscureText: true,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecorations.authInputDecoration(
-                  hintText: '****',
-                  labelText: 'Contraseña',
-                  prefixIcon: Icons.lock_outline),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                return (value != null && value.length >= 6)
-                    ? null
-                    : 'La contraseña debe de ser mayor de 6 caracteres';
-              },
+            onChanged: (value) {
+              loginForm.email = value;
+            },
+            // valdiacion
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              String pattern =
+                  r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+              RegExp regExp = RegExp(pattern);
+              return regExp.hasMatch(value ?? '')
+                  ? null
+                  : 'El correo no es correcto';
+            },
+          ),
+          const SizedBox(height: 30),
+          TextFormField(
+            autocorrect: false,
+            obscureText: true,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecorations.authInputDecoration(
+                hintText: '****',
+                labelText: 'Contraseña',
+                prefixIcon: Icons.lock_outline),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            onChanged: (value) {
+              loginForm.password = value;
+            },
+            validator: (value) {
+              return (value != null && value.length >= 6)
+                  ? null
+                  : 'La contraseña debe de ser mayor de 6 caracteres';
+            },
+          ),
+          const SizedBox(height: 30),
+          MaterialButton(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(height: 30),
-            MaterialButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              disabledColor: Colors.grey,
-              elevation: 0,
-              color: Colors.deepPurple,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
-                child: const Text(
-                  'Ingresar',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
+            disabledColor: Colors.grey,
+            elevation: 0,
+            color: Colors.deepPurple,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+              child: const Text(
+                'Ingresar',
+                style: TextStyle(
+                  color: Colors.white,
                 ),
               ),
-              onPressed: () {},
             ),
-          ],
-        ),
+            onPressed: () {
+              if (!loginForm.isValidForm()) return;
+              Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+            },
+          ),
+        ],
       ),
     );
   }
